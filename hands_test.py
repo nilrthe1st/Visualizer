@@ -35,6 +35,14 @@ face = mp_face.FaceDetection(model_selection=0, min_detection_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose(
+    static_image_mode=False,
+    model_complexity=1,
+    enable_segmentation=False,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5
+)
 
 
 hands = mp_hands.Hands(
@@ -64,6 +72,15 @@ while True:
 
     results = hands.process(rgb)
     face_results = face.process(rgb)
+
+    pose_results = pose.process(rgb)
+
+    if pose_results.pose_landmarks:
+        mp_draw.draw_landmarks(
+            frame,
+            pose_results.pose_landmarks,
+            mp_pose.POSE_CONNECTIONS
+        )
 
     if results.multi_hand_landmarks:
         h, w, _ = frame.shape
@@ -125,5 +142,6 @@ while True:
 cv2.destroyAllWindows()
 hands.close()
 face.close()
+pose.close()
 
 cap.release()
